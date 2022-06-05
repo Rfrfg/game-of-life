@@ -36,6 +36,7 @@ uses crt;
 
 {setting the size of the simulation}
 const length = 40; height = 20;  {length and height must be an integer that is < 255}
+      delay_ms = 700; {time interval between each generation, in millisecond}
 
 type cellStructure = array[0..height + 1, 0..length + 1] of char;
 
@@ -62,7 +63,7 @@ begin
     isSame := true;
     for i := 1 to height do
         for j := 1 to length do
-            if old[i ,j] = new[i, j] then
+            if old[i ,j] <> new[i, j] then
                 isSame := false;
 end;
 
@@ -80,7 +81,7 @@ begin
         writeln(count, 'th generation');
 end;
 
-procedure printPattern(cell : cellStructure);
+procedure printPattern(var cell : cellStructure);
 begin
 	write('|');
     for i := 1 to length do
@@ -89,9 +90,14 @@ begin
 	for i := 1 to height do
 	begin
 	    write('|');
-        textcolor(lightblue);
 		for j := 1 to length do
+		begin
+		    if cell[i, j] = 'X' then
+		        textcolor(lightblue)
+		    else if cell[i, j] = 'o' then
+		        textcolor(yellow);
 			write(cell[i, j]);
+		end;
     	textcolor(white);
 		writeln('│');
 	end;
@@ -179,15 +185,19 @@ begin
 	end;
 
     {main loop}
-	while (continue <> 'N') and (continue <> 'n') do
+	while not keypressed do
 	begin
 	    clrscr;
+	    
+		{giving instrctions on how to stop}
+		writeln('Press any key to stop the simulation');
 		{EXTRA: telling user how many generations have pasted}
 		showGeneration(count);
         
         {EXTRA: remind user if newcell is empty}
         if isEmpty(newcell) then
             writeln('Reminder: all cells are dead, type N to leave the program')
+        {EXTRA: remind user if there are no change between 2 generations}
         else if (count > 1) and isSame(oldcell, newcell) then
             writeln('Reminder: this generation is the same as the previous one');
         
@@ -197,7 +207,11 @@ begin
 		{transferring newcell to oldcell}
 		for i := 1 to height do
 		    for j := 1 to length do
+		    begin
 		        oldcell[i, j] := newcell[i, j];
+		        if oldcell[i, j] = 'o' then
+		            oldcell[i, j] := ' ';
+		    end;
 		
 		{missing code}
 		{DONE: generating new generation}
@@ -205,6 +219,7 @@ begin
 		begin
 			for j := 1 to length do
 			begin
+			    {change o to space}
 			    {DONE: check nearby live cell amount}
 			    nearby := 0;
 			    for x := -1 to 1 do
@@ -218,11 +233,11 @@ begin
 			        end;
 			    
 			    {DONE: check rule 1}
-			    if (oldcell[i, j] = 'X') and (nearby < 2) then
-			        newcell[i, j] := ' '
+			    if ((oldcell[i, j] = 'X') or (oldcell[i, j] = 'o')) and (nearby < 2) then
+			        newcell[i, j] := 'o'
 			    {DONE: check rule 3}
-			    else if (oldcell[i, j] = 'X') and (nearby > 3) then
-			        newcell[i, j] := ' '
+			    else if ((oldcell[i, j] = 'X') or (oldcell[i, j] = 'o')) and (nearby > 3) then
+			        newcell[i, j] := 'o'
 			    {DONE: check rule 4}
 			    else if (oldcell[i, j] = ' ') and (nearby = 3) then
 			        newcell[i, j] := 'X'
@@ -233,9 +248,9 @@ begin
         end;
             
         inc(count);
-		write('Continue (Y/N)? ');
-		readln(continue);
+		delay(delay_ms);
 	end;
+	
 	writeln;
 	writeln('program ended');
 end.
