@@ -1,5 +1,5 @@
 {
-    S2 CL final project, Life
+    S2 CL final project, Game of Life
     
     pos:
         (-1, -1), (0, -1), (1, -1)
@@ -22,32 +22,23 @@
         byte: 0 .. 255
         word: 0 .. 65535
 }
-{
-     __       __   _______  _______ 
-    |  |     |  | |   ____||   ____|
-    |  |     |  | |  |__   |  |__   
-    |  |     |  | |   __|  |   __|  
-    |  `----.|  | |  |     |  |____ 
-    |_______||__| |__|     |_______|
-                                
-}
+{$mode objfpc}
 program life;
 uses crt;
 
 {setting the size of the simulation}
 const length = 40; height = 20;  {length and height must be an integer that is < 255}
-      delay_ms = 700; {time interval between each generation, in millisecond}
+  delay_ms = 700; {time interval between each generation, in millisecond}
 
 type cellStructure = array[0..height + 1, 0..length + 1] of char;
 
 {dont use confusing variable names, tell others what your variable is doing}
 {eg. nb, rno, cont in the given code}
-var	ratio : integer;
-    count : word;
-	picker, nearby : byte;
-	i, j : byte;    x, y : shortint;{for the for loops}
-	oldcell, newcell : cellStructure;
-	continue, isManual, isAlive : char;
+var count : word;
+picker, nearby : byte;
+i, j : byte;    x, y : shortint;{for the for loops}
+oldcell, newcell : cellStructure;
+continue, isManual, isAlive : char;
 
 function isEmpty(var cell : cellStructure) : boolean;
 begin
@@ -67,6 +58,30 @@ begin
                 isSame := false;
 end;
 
+procedure randomlyGenerate(var cell : cellStructure; begin_height : byte = 1; begin_length : byte = 1);
+var picker : byte;
+ratio : integer;
+begin
+    {ask for ratio}
+    write('Enter the initial percentage of living cells (0-100) : ');
+    readln(ratio);
+    
+    {DONE: validation of user input}
+    while (ratio < 0) or (ratio > 100) do
+    begin
+        write('Invalid input, enter again: ');
+        readln(ratio);
+    end;
+    
+    for i := begin_height to height do
+    	for j := begin_length to length do
+    	begin
+    		picker := random(100);
+    		if picker < ratio then
+    			cell[i, j] := 'X'
+    	end;
+end;
+
 procedure showGeneration(count : byte);
 var temp : byte;
 begin
@@ -83,174 +98,162 @@ end;
 
 procedure printPattern(var cell : cellStructure);
 begin
-	write('|');
+    write('|');
     for i := 1 to length do
         write('-');
     writeln('|');
-	for i := 1 to height do
-	begin
-	    write('|');
-		for j := 1 to length do
-		begin
-		    if cell[i, j] = 'X' then
-		        textcolor(lightblue)
-		    else if cell[i, j] = 'o' then
-		        textcolor(yellow);
-			write(cell[i, j]);
-		end;
+    for i := 1 to height do
+    begin
+        write('|');
+    	for j := 1 to length do
+    	begin
+    	    if cell[i, j] = 'X' then
+    	        textcolor(lightblue)
+    	    else if cell[i, j] = 'o' then
+    	        textcolor(yellow);
+    		write(cell[i, j]);
+    	end;
     	textcolor(white);
-		writeln('│');
-	end;
-	write('|');
-	for i := 1 to length do
-	    write('-');
-	writeln('|');
+    	writeln('│');
+    end;
+    write('|');
+    for i := 1 to length do
+        write('-');
+    writeln('|');
 end;
 
 {main program}
 begin
     {initialize the program}
-	randomize;
-	continue := 'Y';
-	count := 1;
-	textcolor(white);
-	textmode(CO80); {refer to reference}
-	
-	{introduce the game to user}
-	writeln('            __       __   _______  _______');
-	writeln('           |  |     |  | |   ____||   ____|');
-	writeln('           |  |     |  | |  |__   |  |');
-	writeln('           |  |     |  | |   __|  |   __|');
-	writeln('           |  `----.|  | |  |     |  |____');
-	writeln('           |_______||__| |__|     |_______|');
-	writeln;
-	writeln;
-	writeln('The Game of Life, also known simply as Life, is a cellular automaton devised by the British mathematician John Horton Conway in 1970. The "game" is a zero-player game, meaning that its evolution is determined by its initial state, requiring no further input.');
+    randomize;
+    continue := 'Y';
+    count := 1;
+    textcolor(white);
+    textmode(CO80); {refer to reference}
+    
+    {setting all the elements to be space}
+    for i := 0 to height+1 do
+    	for j := 0 to length+1 do
+    		newcell[i, j] := ' ';
+    
+    {introduce the game to user}
+    writeln('            __       __   _______  _______');
+    writeln('           |  |     |  | |   ____||   ____|');
+    writeln('           |  |     |  | |  |__   |  |');
+    writeln('           |  |     |  | |   __|  |   __|');
+    writeln('           |  `----.|  | |  |     |  |____');
+    writeln('           |_______||__| |__|     |_______|');
+    writeln;
+    writeln;
+    writeln('The Game of Life, also known simply as Life, is a cellular automaton devised by the British mathematician John Horton Conway in 1970. The "game" is a zero-player game, meaning that its evolution is determined by its initial state, requiring no further input.');
     writeln('------------------------------------------------------');
-	
-	{setting all the elements to be space}
-	for i := 0 to height+1 do
-		for j := 0 to length+1 do
-			newcell[i, j] := ' ';
-	
-	{EXTRA: ask for generating randomly or entering themselves}
-	write('Enter Y if you want to enter the seeds manually: ');
-	readln(isManual);
-
+    
+    
+    {EXTRA: ask for generating randomly or entering themselves}
+    write('Enter Y if you want to enter the seeds manually: ');
+    readln(isManual);
+    
     {EXTRA: human entering the seeds himself with validation}
-	if (isManual = 'y') or (isManual = 'Y') then
-	begin
-	    writeln('Enter X if you want the cell to be alive, while enter O if you want it to be dead.');
-	    for i := 1 to height do
-	        for j := 1 to length do
-	        begin
-	            write('Cell[', i, ' ,', j, ']: ');
-	            readln(isAlive);
-	            
-	            {validation}
-	            while (isAlive <> 'X') and (isAlive <> 'x') and (isAlive <> 'O') and (isAlive <> 'o') do
-	            begin
-	                write('You did not enter a valid letter, enter again: ');
-	                readln(isAlive);
-	            end;
-	            
-	            {determine}
-	            if (isAlive = 'x') or (isAlive = 'X') then
-	                newcell[i, j] := 'X'
-	            else
-	                newcell[i, j] := ' ';
-	        end;
-	end
-	else
-	begin
-	    {ask for ratio}
-    	write('Enter the initial percentage of living cells (0-100) : ');
-    	readln(ratio);
-    	
-    	{DONE: validation of user input}
-        while (ratio < 0) or (ratio > 100) do
-        begin
-            write('Invalid input, enter again: ');
-            readln(ratio);
-        end;
-        
-        {randomly generate 'X' based on given ratio}
-    	for i := 1 to height do
-    		for j := 1 to length do
-    		begin
-    			picker := random(100);
-    			if picker < ratio then
-    				newcell[i, j] := 'X'
-    	    end;
-	end;
-
+    if (isManual = 'y') or (isManual = 'Y') then
+    begin
+        writeln('Enter X for alive cell, enter O for dead cell.');
+        writeln('Enter R if you want to randomly generate for the rest of the cells');
+        for i := 1 to height do
+            for j := 1 to length do
+            begin
+                write('Cell[', i, ' ,', j, ']: ');
+                readln(isAlive);
+                
+                {validation}
+                while (isAlive <> 'X') and (isAlive <> 'x') and (isAlive <> 'O') and (isAlive <> 'o') and (isAlive <> 'R') and (isAlive <> 'r') do
+                begin
+                    write('You did not enter a valid letter, enter again: ');
+                    readln(isAlive);
+                end;
+                
+                {determine}
+                if (isAlive = 'x') or (isAlive = 'X') then
+                    newcell[i, j] := 'X'
+                else if (isAlive = 'o') or (isAlive = 'O') then
+                    newcell[i, j] := ' '
+                else
+                begin
+                    randomlyGenerate(newcell, i, j)
+                end;
+            end;
+    end
+    else
+    begin
+        {randomly generate 'X' based on the ratio asked inside the procedure}
+        randomlyGenerate(newcell);
+    end;
+    
     {main loop}
-	while not keypressed do
-	begin
-	    clrscr;
-	    
-		{giving instrctions on how to stop}
-		writeln('Press any key to stop the simulation');
-		{EXTRA: telling user how many generations have pasted}
-		showGeneration(count);
+    while not keypressed do
+    begin
+        clrscr;
+        
+        {EXTRA: telling user how many generations have pasted}
+        showGeneration(count);
         
         {EXTRA: remind user if newcell is empty}
         if isEmpty(newcell) then
-            writeln('Reminder: all cells are dead, type N to leave the program')
+            write('Reminder: all cells are dead, ')
         {EXTRA: remind user if there are no change between 2 generations}
         else if (count > 1) and isSame(oldcell, newcell) then
-            writeln('Reminder: this generation is the same as the previous one');
+            write('Reminder: this generation is the same as the previous one, ');
         
-	    {printing the pattern of newcell (EXTRA: with borders)}
-		printPattern(newcell);
-		
-		{transferring newcell to oldcell}
-		for i := 1 to height do
-		    for j := 1 to length do
-		    begin
-		        oldcell[i, j] := newcell[i, j];
-		        if oldcell[i, j] = 'o' then
-		            oldcell[i, j] := ' ';
-		    end;
-		
-		{missing code}
-		{DONE: generating new generation}
-		for i := 1 to height do
-		begin
-			for j := 1 to length do
-			begin
-			    {change o to space}
-			    {DONE: check nearby live cell amount}
-			    nearby := 0;
-			    for x := -1 to 1 do
-			        for y := -1 to 1 do
-			        begin
+        {giving instrctions on how to stop}
+        writeln('press any key to stop the simulation');
+        
+        {printing the pattern of newcell (EXTRA: with borders)}
+        printPattern(newcell);
+        
+        {transferring newcell to oldcell}
+        for i := 1 to height do
+            for j := 1 to length do
+            begin
+                oldcell[i, j] := newcell[i, j];
+                if oldcell[i, j] = 'o' then
+                    oldcell[i, j] := ' ';
+            end;
+    	
+        {missing code}
+        {DONE: generating new generation}
+        for i := 1 to height do
+        begin
+            for j := 1 to length do
+            begin
+                {DONE: check nearby live cell amount}
+                nearby := 0;
+                for x := -1 to 1 do
+                    for y := -1 to 1 do
+                    begin
                         {skip the original cell itself so that it wont be counted}
                         if (i + x = i) and (j + y = j) then 
                             system.Continue;
-			            if oldcell[i + x, j + y] = 'X' then
-			                inc(nearby);
-			        end;
-			    
-			    {DONE: check rule 1}
-			    if ((oldcell[i, j] = 'X') or (oldcell[i, j] = 'o')) and (nearby < 2) then
-			        newcell[i, j] := 'o'
-			    {DONE: check rule 3}
-			    else if ((oldcell[i, j] = 'X') or (oldcell[i, j] = 'o')) and (nearby > 3) then
-			        newcell[i, j] := 'o'
-			    {DONE: check rule 4}
-			    else if (oldcell[i, j] = ' ') and (nearby = 3) then
-			        newcell[i, j] := 'X'
-			    {DONE: final case: rule 2}
-			    else
-			        newcell[i, j] := oldcell[i, j];
-			end;
+                        if oldcell[i + x, j + y] = 'X' then
+                            inc(nearby);
+                    end;
+
+                {DONE: check rule 1}
+                if ((oldcell[i, j] = 'X') or (oldcell[i, j] = 'o')) and (nearby < 2) then
+                    newcell[i, j] := 'o'
+                {DONE: check rule 3}
+                else if ((oldcell[i, j] = 'X') or (oldcell[i, j] = 'o')) and (nearby > 3) then
+                    newcell[i, j] := 'o'
+                {DONE: check rule 4}
+                else if (oldcell[i, j] = ' ') and (nearby = 3) then
+                    newcell[i, j] := 'X'
+                {DONE: final case: rule 2}
+                else
+                    newcell[i, j] := oldcell[i, j];
+            end;
         end;
             
         inc(count);
-		delay(delay_ms);
-	end;
-	
-	writeln;
-	writeln('program ended');
+    	delay(delay_ms);
+    end;
+    writeln;
+    writeln('program ended');
 end.
