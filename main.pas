@@ -78,7 +78,7 @@ begin
     	begin
     		picker := random(100);
     		if picker < ratio then
-    			cell[i, j] := 'X'
+    			cell[i, j] := 'X';
     	end;
 end;
 
@@ -105,16 +105,16 @@ begin
     for i := 1 to height do
     begin
         write('|');
-    	for j := 1 to length do
-    	begin
-    	    if cell[i, j] = 'X' then
-    	        textcolor(lightblue)
-    	    else if cell[i, j] = 'o' then
-    	        textcolor(yellow);
-    		write(cell[i, j]);
-    	end;
-    	textcolor(white);
-    	writeln('│');
+        for j := 1 to length do
+        begin
+            if cell[i, j] = 'X' then
+                textcolor(lightblue)
+            else if cell[i, j] = 'o' then
+                textcolor(yellow);
+            write(cell[i, j]);
+        end;
+        textcolor(white);
+        writeln('│');
     end;
     write('|');
     for i := 1 to length do
@@ -133,8 +133,8 @@ begin
     
     {setting all the elements to be space}
     for i := 0 to height+1 do
-    	for j := 0 to length+1 do
-    		newcell[i, j] := ' ';
+        for j := 0 to length+1 do
+            newcell[i, j] := ' ';
     
     {introduce the game to user}
     writeln('            __       __   _______  _______');
@@ -177,17 +177,13 @@ begin
                 else if (isAlive = 'o') or (isAlive = 'O') then
                     newcell[i, j] := ' '
                 else
-                begin
-                    randomlyGenerate(newcell, i, j)
-                end;
+                    randomlyGenerate(newcell, i, j);
             end;
     end
     else
-    begin
         {randomly generate 'X' based on the ratio asked inside the procedure}
         randomlyGenerate(newcell);
-    end;
-    
+
     {main loop}
     while not keypressed do
     begin
@@ -204,7 +200,7 @@ begin
             write('Reminder: this generation is the same as the previous one, ');
         
         {giving instrctions on how to stop}
-        writeln('press any key to stop the simulation');
+        writeln('press any key to stop');
         
         {printing the pattern of newcell (EXTRA: with borders)}
         printPattern(newcell);
@@ -221,7 +217,6 @@ begin
         {missing code}
         {DONE: generating new generation}
         for i := 1 to height do
-        begin
             for j := 1 to length do
             begin
                 {DONE: check nearby live cell amount}
@@ -249,10 +244,9 @@ begin
                 else
                     newcell[i, j] := oldcell[i, j];
             end;
-        end;
-            
+        
         inc(count);
-    	delay(delay_ms);
+        delay(delay_ms);
     end;
     writeln;
     writeln('program ended');
