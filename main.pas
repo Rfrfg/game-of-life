@@ -1,11 +1,6 @@
 {
     S2 CL final project, Game of Life
     
-    pos:
-        (-1, -1), (0, -1), (1, -1)
-        (-1, 0), (0, 0), (1, 0)
-        (-1, 1), (0, 1), (1, 1)
-    
     generation rule:
         1. Any live cell with <2 live cells -> dies (change to ' ')
         2. Any live cell with 2/3 live cells -> nothing happens
@@ -28,7 +23,7 @@ uses crt;
 
 {setting the size of the simulation}
 const length = 40; height = 20;  {length and height must be an integer that is < 255}
-  delay_ms = 700; {time interval between each generation, in millisecond}
+  delay_ms = 650; {time interval between each generation, in millisecond}
 
 type cellStructure = array[0..height + 1, 0..length + 1] of char;
 
@@ -38,7 +33,7 @@ var count : word;
 picker, nearby : byte;
 i, j : byte;    x, y : shortint;{for the for loops}
 oldcell, newcell : cellStructure;
-continue, isManual, isAlive : char;
+isManual, isAlive : char;
 
 function isEmpty(var cell : cellStructure) : boolean;
 begin
@@ -60,7 +55,7 @@ end;
 
 procedure randomlyGenerate(var cell : cellStructure; begin_height : byte = 1; begin_length : byte = 1);
 var picker : byte;
-ratio : integer;
+    ratio : integer;
 begin
     {ask for ratio}
     write('Enter the initial percentage of living cells (0-100) : ');
@@ -86,14 +81,25 @@ procedure showGeneration(count : byte);
 var temp : byte;
 begin
     temp := count mod 10;
-    if temp = 1 then
-        writeln(count, 'st generation')
-    else if temp = 2 then
-        writeln(count, 'nd generation')
-    else if temp = 3 then
-        writeln(count, 'rd generation')
+    {exceptional case: 11th and 12th}
+    if count = 11 then
+    begin
+        writeln('11th generation');
+        exit;
+    end;
+    if count = 12 then
+    begin
+        writeln('12th generation');
+        exit;
+    end;
+    
+    case temp of
+        1: writeln(count, 'st generation');
+        2: writeln(count, 'nd generation');
+        3: writeln(count, 'rd generation');
     else
         writeln(count, 'th generation');
+    end;
 end;
 
 procedure printPattern(var cell : cellStructure);
@@ -126,7 +132,6 @@ end;
 begin
     {initialize the program}
     randomize;
-    continue := 'Y';
     count := 1;
     textcolor(white);
     textmode(CO80); {refer to reference}
@@ -150,9 +155,17 @@ begin
     
     
     {EXTRA: ask for generating randomly or entering themselves}
-    write('Enter Y if you want to enter the seeds manually: ');
+    write('Enter Y to enter the seeds manually, enter N to automatically generate the seed:');
     readln(isManual);
     
+    {EXTRA: validate isManual}
+    while (isManual <> 'y') and (isManual <> 'Y') and (isManual <> 'n') and (isManual <> 'N') do
+    begin
+        write('Invalid input! Enter again: ');
+        readln(isManual);
+    end;
+    
+    clrscr;
     {EXTRA: human entering the seeds himself with validation}
     if (isManual = 'y') or (isManual = 'Y') then
     begin
@@ -167,7 +180,7 @@ begin
                 {validation}
                 while (isAlive <> 'X') and (isAlive <> 'x') and (isAlive <> 'O') and (isAlive <> 'o') and (isAlive <> 'R') and (isAlive <> 'r') do
                 begin
-                    write('You did not enter a valid letter, enter again: ');
+                    write('You did not enter a valid option, enter again: ');
                     readln(isAlive);
                 end;
                 
