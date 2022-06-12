@@ -23,13 +23,13 @@ uses crt;
 
 {setting the size of the simulation}
 const length = 40; height = 20;  {length and height must be an integer that is < 255}
-  delay_ms = 650; {time interval between each generation, in millisecond}
+  delay_ms = 50; {time interval between each generation, in millisecond}
 
 type cellStructure = array[0..height + 1, 0..length + 1] of char;
 
 {dont use confusing variable names, tell others what your variable is doing}
 {eg. nb, rno, cont in the given code}
-var count : word;
+var count : Uint16;
 picker, nearby : byte;
 i, j : byte;    x, y : shortint;{for the for loops}
 oldcell, newcell : cellStructure;
@@ -150,7 +150,7 @@ begin
     writeln('           |_______||__| |__|     |_______|');
     writeln;
     writeln;
-    writeln('The Game of Life, also known simply as Life, is a cellular automaton devised by the British mathematician John Horton Conway in 1970. The "game" is a zero-player game, meaning that its evolution is determined by its initial state, requiring no further input.');
+    writeln('The Game of Life, also known simply as Life, is a cellular automation devised by the British mathematician John Horton Conway in 1970. The "game" is a zero-player game, meaning that its evolution is determined by its initial state, requiring no further input.');
     writeln('------------------------------------------------------');
     
     
