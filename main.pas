@@ -29,8 +29,8 @@ type cellStructure = array[0..height + 1, 0..length + 1] of char;
 
 {dont use confusing variable names, tell others what your variable is doing}
 {eg. nb, rno, cont in the given code}
-var count : Uint16;
-picker, nearby : byte;
+var count : word;
+nearby : byte;
 i, j : byte;    x, y : shortint;{for the for loops}
 oldcell, newcell : cellStructure;
 isManual, isAlive : char;
@@ -77,10 +77,8 @@ begin
     	end;
 end;
 
-procedure showGeneration(count : byte);
-var temp : byte;
+procedure showGeneration(count : word);
 begin
-    temp := count mod 10;
     {exceptional case: 11th and 12th}
     if count = 11 then
     begin
@@ -93,7 +91,7 @@ begin
         exit;
     end;
     
-    case temp of
+    case count mod 10 of {getting the last digit of count}
         1: writeln(count, 'st generation');
         2: writeln(count, 'nd generation');
         3: writeln(count, 'rd generation');
@@ -142,15 +140,15 @@ begin
             newcell[i, j] := ' ';
     
     {introduce the game to user}
-    writeln('            __       __   _______  _______');
-    writeln('           |  |     |  | |   ____||   ____|');
-    writeln('           |  |     |  | |  |__   |  |');
-    writeln('           |  |     |  | |   __|  |   __|');
-    writeln('           |  `----.|  | |  |     |  |____');
-    writeln('           |_______||__| |__|     |_______|');
+    writeln(' __       __   _______  _______ ':53);
+    writeln('|  |     |  | |   ____||   ____|':53);
+    writeln('|  |     |  | |  |__   |  |     ':53);
+    writeln('|  |     |  | |   __|  |   __|  ':53);
+    writeln('|  `----.|  | |  |     |  |____ ':53);
+    writeln('|_______||__| |__|     |_______|':53);
     writeln;
     writeln;
-    writeln('The Game of Life, also known simply as Life, is a cellular automation devised by the British mathematician John Horton Conway in 1970. The "game" is a zero-player game, meaning that its evolution is determined by its initial state, requiring no further input.');
+    writeln('The Game of Life, also known simply as Life, is a cellular automaton devised by the British mathematician John Horton Conway in 1970. The "game" is a zero-player game, meaning that its evolution is determined by its initial state, requiring no further input.');
     writeln('------------------------------------------------------');
     
     
